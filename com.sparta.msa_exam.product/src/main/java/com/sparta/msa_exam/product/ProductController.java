@@ -31,7 +31,13 @@ public class ProductController {
 
     // 특정 상품 조회
     @GetMapping("/{product_id}")
-    public ProductResponseDto getProductById(@PathVariable("product_id") Long product_id) {
+    public ProductResponseDto getProductById(@PathVariable Long product_id) {
         return productService.getProductById(product_id);
+    }
+
+    // 상품 수량 감소
+    @GetMapping("/{product_id}/reduceQuantity")
+    public void reduceProductQuantity(@PathVariable Long product_id, @RequestParam int quantity) {
+        productService.reduceProductQuantity(product_id, quantity);
     }
 }
