@@ -33,9 +33,9 @@ public class AuthService {
     }
 
     /**
-     * 사용자 ID를 받아 JWT 액세스 토큰을 생성
+     * 사용자 ID를 받아 JWT access 토큰을 생성
      * @param user_id 사용자 ID
-     * @return 생성된 JWT 액세스 토큰
+     * @return 생성된 JWT access 토큰
      */
     public String createAccessToken(String user_id) {
         return Jwts.builder()
