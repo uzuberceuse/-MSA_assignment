@@ -63,7 +63,9 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter {
     // 토큰 유효 검증
     private boolean validateToken(String token, ServerWebExchange exchange) {
         try {
+            // String -> SecretKey 변환 작업
             SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secretKey));
+            // JWT에 설정되 정보 불러오기
             Jws<Claims> claimsJws = Jwts.parser()
                     .verifyWith(key)
                     .build().parseSignedClaims(token);
