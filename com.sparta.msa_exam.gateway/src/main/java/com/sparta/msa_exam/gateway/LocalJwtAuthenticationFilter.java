@@ -31,8 +31,8 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter {
 
         String path = exchange.getRequest().getURI().getPath();
 
-        // /signIn 경로는 필터를 적용하지 않음
-        if (path.equals("/auth/signIn")) {
+        // /signIn, /signUp 경로는 필터를 적용하지 않음
+        if (path.equals("/auth/signIn") || path.equals("/auth/signUp")) {
             return chain.filter(exchange);
         }
 
@@ -41,7 +41,7 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter {
         String token = extractToken(exchange);
 
         // 아래 validateToken 메서드 참고
-        if (token == null || !validateToken(token)) {
+        if (token == null || !validateToken(token, exchange)) {
             exchange.getResponse().setStatusCode(HttpStatus.UNAUTHORIZED);
             return exchange.getResponse().setComplete();
         }
@@ -61,7 +61,7 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter {
     }
 
     // 토큰 유효 검증
-    private boolean validateToken(String token) {
+    private boolean validateToken(String token, ServerWebExchange exchange) {
         try {
             SecretKey key = Keys.hmacShaKeyFor(Decoders.BASE64URL.decode(secretKey));
             Jws<Claims> claimsJws = Jwts.parser()
@@ -70,6 +70,11 @@ public class LocalJwtAuthenticationFilter implements GlobalFilter {
 
             // 토큰 값 로깅
             log.info("#####payload :: " + claimsJws.getPayload().toString());
+
+            Claims claims = claimsJws.getBody();
+            exchange.getRequest().mutate()
+                    .header("X-User-Id", claims.get("user_id").toString())
+                    .build();
             return true;
         } catch (Exception e) {
             return false;
